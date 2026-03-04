@@ -1,24 +1,43 @@
 import SwiftUI
+import AppKit
 
 @main
 struct MarkviewzApp: App {
-    @State private var initialFile: URL? = Self.fileFromArgs()
+    @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
 
     var body: some Scene {
         WindowGroup {
-            ContentView(initialFile: initialFile)
+            ContentView()
+                .environmentObject(appDelegate)
         }
         .commands {
             CommandGroup(replacing: .newItem) { }
         }
     }
+}
 
-    private static func fileFromArgs() -> URL? {
+class AppDelegate: NSObject, NSApplicationDelegate, ObservableObject {
+    @Published var fileToOpen: URL?
+
+    func applicationDidFinishLaunching(_ notification: Notification) {
+        NSApp.setActivationPolicy(.regular)
+        NSApp.activate(ignoringOtherApps: true)
+
+        // Handle CLI arguments (when running binary directly)
         let args = CommandLine.arguments
-        guard args.count > 1 else { return nil }
-        let path = args[1]
-        let url = URL(fileURLWithPath: (path as NSString).standardizingPath)
-        guard FileManager.default.fileExists(atPath: url.path) else { return nil }
-        return url
+        if args.count > 1 {
+            let path = (args[1] as NSString).standardizingPath
+            let url = URL(fileURLWithPath: path)
+            if FileManager.default.fileExists(atPath: url.path) {
+                fileToOpen = url
+            }
+        }
+    }
+
+    // Handle files opened via `open -a Markviewz file.md` or Finder double-click
+    func application(_ application: NSApplication, open urls: [URL]) {
+        if let url = urls.first {
+            fileToOpen = url
+        }
     }
 }

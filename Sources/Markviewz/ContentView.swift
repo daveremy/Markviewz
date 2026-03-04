@@ -2,7 +2,7 @@ import SwiftUI
 import UniformTypeIdentifiers
 
 struct ContentView: View {
-    let initialFile: URL?
+    @EnvironmentObject var appDelegate: AppDelegate
 
     @State private var htmlContent: String = wrapHTMLPage(body: welcomeHTML)
     @State private var showFileImporter = false
@@ -44,9 +44,9 @@ struct ContentView: View {
                 }
             }
             .navigationTitle(windowTitle)
-            .onAppear {
-                if let file = initialFile {
-                    openFile(file)
+            .onReceive(appDelegate.$fileToOpen) { url in
+                if let url = url {
+                    openFile(url)
                 }
             }
     }
