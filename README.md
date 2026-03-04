@@ -13,7 +13,7 @@ MacDown is deprecated. Most markdown apps are editors. Sometimes you just want t
 Requires macOS 14+ and Swift 5.9+.
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/Markviewz.git
+git clone https://github.com/daveremy/Markviewz.git
 cd Markviewz
 swift build -c release
 cp .build/release/Markviewz /usr/local/bin/markviewz
