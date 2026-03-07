@@ -40,6 +40,14 @@ If you use [Claude Code](https://claude.com/claude-code), install Markviewz as a
 
 Then ask Claude to "show me the README" or use `/markviewz README.md`. If the binary isn't installed yet, Claude will guide you through the install.
 
+### Gemini CLI Extension
+
+If you use [Gemini CLI](https://github.com/google-gemini/gemini-cli), install the extension:
+
+```
+gemini extensions install https://github.com/daveremy/Markviewz.git
+```
+
 ### Manual Install
 
 Requires macOS 14+ and Swift 5.9+.
