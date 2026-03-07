@@ -60,12 +60,6 @@ func renderMarkdown(_ markdown: String) -> String {
 
 /// Extract YAML frontmatter (between --- delimiters at start of file)
 private func extractFrontmatter(_ markdown: String) -> (frontmatter: String?, body: String) {
-    let trimmed = markdown.trimmingCharacters(in: .whitespacesAndNewlines)
-    guard trimmed.hasPrefix("---") else {
-        return (nil, markdown)
-    }
-
-    // Find closing ---
     let lines = markdown.components(separatedBy: "\n")
     guard lines.first?.trimmingCharacters(in: .whitespaces) == "---" else {
         return (nil, markdown)
