@@ -1,0 +1,11 @@
+{
+  "name": "markviewz",
+  "description": "Open .md files in a native macOS markdown viewer. Adds the /markviewz skill to preview markdown files with proper formatting, dark mode, and GitHub-style typography.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Dave Remy"
+  },
+  "homepage": "https://github.com/daveremy/Markviewz",
+  "repository": "https://github.com/daveremy/Markviewz",
+  "license": "MIT"
+}

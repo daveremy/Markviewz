@@ -1,0 +1,17 @@
+{
+  "name": "Markviewz",
+  "owner": {
+    "name": "Dave Remy"
+  },
+  "plugins": [
+    {
+      "name": "markviewz",
+      "source": "./plugins/markviewz",
+      "description": "Open .md files in a native macOS markdown viewer from Claude Code",
+      "version": "1.0.0",
+      "author": {
+        "name": "Dave Remy"
+      }
+    }
+  ]
+}
