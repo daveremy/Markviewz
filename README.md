@@ -48,6 +48,14 @@ If you use [Gemini CLI](https://github.com/google-gemini/gemini-cli), install th
 gemini extensions install https://github.com/daveremy/Markviewz.git
 ```
 
+### Codex CLI Skill
+
+If you use [Codex CLI](https://github.com/openai/codex), ask Codex to install the skill:
+
+```
+install the markviewz skill from daveremy/Markviewz at path codex/markviewz
+```
+
 ### Manual Install
 
 Requires macOS 14+ and Swift 5.9+.
