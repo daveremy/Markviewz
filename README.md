@@ -1,12 +1,31 @@
 # Markviewz
 
-A simple, native macOS markdown viewer. No editing, no bloat — just clean, readable markdown.
+A lightweight, native macOS markdown viewer built for the AI-assisted development workflow.
 
-Built with SwiftUI and WKWebView. Renders GitHub-flavored markdown with automatic dark mode support.
+## The Problem
 
-## Why?
+CLI-based AI assistants (Claude Code, Codex, Aider, etc.) generate and work with `.md` files constantly — README files, documentation, changelogs, specs, reports. But reading raw markdown in the terminal is painful, and most markdown apps are heavyweight editors when all you need is a *viewer*.
 
-MacDown is deprecated. Most markdown apps are editors. Sometimes you just want to *read* a `.md` file with nice formatting.
+## The Solution
+
+Markviewz is a read-only markdown viewer that stays out of your way. Open a file from the terminal, read it with proper formatting, get back to work.
+
+```bash
+markviewz README.md
+```
+
+That's it. No editing, no bloat, no Electron. Just a native Mac app that renders your markdown beautifully.
+
+## Features
+
+- **GitHub-flavored markdown** — tables, task lists, strikethrough, autolinks
+- **YAML frontmatter** — collapsed by default, click to expand
+- **Dark mode** — follows system automatically
+- **Local images** — relative image paths just work
+- **Print support** — Cmd+P to print or export to PDF
+- **Multiple open methods** — CLI, Cmd+O, drag-and-drop, Finder, `open -a`
+- **Single instance** — opening a new file reuses the running app and brings it to front
+- **GitHub-style typography** — clean, readable CSS
 
 ## Install
 
@@ -18,38 +37,35 @@ cd Markviewz
 ./install.sh
 ```
 
-This builds a release binary, creates `Markviewz.app` in `/Applications`, and installs a `markviewz` CLI command.
+This builds a release binary, creates `Markviewz.app` in `/Applications`, and installs a `markviewz` CLI wrapper.
 
 ## Usage
 
 ```bash
-# Open a file from the command line
-open -a Markviewz README.md
+# Open from the terminal (reuses running instance)
+markviewz notes.md
 
-# Or use the CLI shortcut
-markviewz README.md
+# Or use macOS open command
+open -a Markviewz spec.md
 
-# Launch without a file, then use Cmd+O
-open -a Markviewz
+# Launch and use Cmd+O to browse
+markviewz
 ```
 
 You can also drag and drop `.md` files onto the window.
 
-## Features
-
-- GitHub-flavored markdown (tables, task lists, strikethrough, autolinks)
-- GitHub-style CSS typography
-- Dark mode (follows system automatically)
-- Open files via CLI, Cmd+O, drag-and-drop, or Finder
-- Lightweight — no Electron, no web server, just a native Mac app
-
-## Building from source
+## Building from Source
 
 ```bash
 swift build              # debug build
 swift build -c release   # optimized release build
+swift test               # run tests (when available)
 ```
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on how to contribute, our git workflow, and coding standards.
 
 ## License
 
-MIT
+[MIT](LICENSE)
