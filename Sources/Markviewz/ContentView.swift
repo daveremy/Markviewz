@@ -48,6 +48,7 @@ struct ContentView: View {
             .onReceive(appDelegate.$fileToOpen) { url in
                 if let url = url {
                     openFile(url)
+                    appDelegate.fileToOpen = nil
                 }
             }
     }
@@ -64,16 +65,14 @@ struct ContentView: View {
             htmlContent = wrapHTMLPage(body: html)
             baseURL = url.deletingLastPathComponent()
             windowTitle = url.lastPathComponent
-            // Update dock tooltip to show filename instead of "Markviewz"
-            DispatchQueue.main.async {
-                NSApp.windows.first?.miniwindowTitle = url.lastPathComponent
-            }
         } catch {
             htmlContent = wrapHTMLPage(body: "<p style='color:red'>Error reading file: \(error.localizedDescription)</p>")
             windowTitle = "Markviewz"
-            DispatchQueue.main.async {
-                NSApp.windows.first?.miniwindowTitle = "Markviewz"
-            }
+        }
+
+        // Sync dock tooltip with window title
+        DispatchQueue.main.async {
+            NSApp.windows.first?.miniwindowTitle = windowTitle
         }
     }
 }
