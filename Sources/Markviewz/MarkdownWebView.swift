@@ -11,6 +11,10 @@ struct MarkdownWebView: NSViewRepresentable {
     let html: String
     var baseURL: URL?
 
+    func makeCoordinator() -> Coordinator {
+        Coordinator()
+    }
+
     func makeNSView(context: Context) -> WKWebView {
         let config = WKWebViewConfiguration()
         config.preferences.setValue(true, forKey: "developerExtrasEnabled")
@@ -22,8 +26,12 @@ struct MarkdownWebView: NSViewRepresentable {
     }
 
     func updateNSView(_ webView: WKWebView, context: Context) {
+        let loadKey = html + (baseURL?.absoluteString ?? "")
+        guard loadKey != context.coordinator.lastLoadKey else { return }
+        context.coordinator.lastLoadKey = loadKey
+
         if let baseURL = baseURL {
-            // Write HTML to a temp file alongside the markdown so WKWebView
+            // Write HTML to a dotfile alongside the markdown so WKWebView
             // can access local images via relative paths.
             let tempFile = baseURL.appendingPathComponent(".markviewz-preview.html")
             do {
@@ -35,5 +43,9 @@ struct MarkdownWebView: NSViewRepresentable {
         } else {
             webView.loadHTMLString(html, baseURL: nil)
         }
+    }
+
+    class Coordinator {
+        var lastLoadKey: String?
     }
 }

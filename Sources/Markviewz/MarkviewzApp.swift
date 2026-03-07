@@ -23,7 +23,7 @@ struct MarkviewzApp: App {
 
     private func printDocument() {
         guard let webView = WebViewStore.shared.webView else { return }
-        let printInfo = NSPrintInfo.shared
+        let printInfo = NSPrintInfo.shared.copy() as! NSPrintInfo
         printInfo.horizontalPagination = .fit
         printInfo.verticalPagination = .automatic
         printInfo.isHorizontallyCentered = true
@@ -51,10 +51,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, ObservableObject {
         let args = CommandLine.arguments
         if args.count > 1 {
             let path = (args[1] as NSString).standardizingPath
-            let url = URL(fileURLWithPath: path)
-            if FileManager.default.fileExists(atPath: url.path) {
-                fileToOpen = url
-            }
+            fileToOpen = URL(fileURLWithPath: path)
         }
     }
 

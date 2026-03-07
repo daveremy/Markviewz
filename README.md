@@ -29,6 +29,19 @@ That's it. No editing, no bloat, no Electron. Just a native Mac app that renders
 
 ## Install
 
+### Claude Code Plugin (recommended)
+
+If you use [Claude Code](https://claude.com/claude-code), install Markviewz as a plugin to get the `/markviewz` skill:
+
+```
+/plugin marketplace add daveremy/Markviewz
+/plugin install markviewz@Markviewz
+```
+
+Then ask Claude to "show me the README" or use `/markviewz README.md`. If the binary isn't installed yet, Claude will guide you through the install.
+
+### Manual Install
+
 Requires macOS 14+ and Swift 5.9+.
 
 ```bash
@@ -42,7 +55,10 @@ This builds a release binary, creates `Markviewz.app` in `/Applications`, and in
 ## Usage
 
 ```bash
-# Open from the terminal (reuses running instance)
+# From Claude Code
+/markviewz README.md
+
+# From the terminal (reuses running instance)
 markviewz notes.md
 
 # Or use macOS open command
