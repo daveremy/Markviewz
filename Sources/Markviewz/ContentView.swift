@@ -64,17 +64,39 @@ struct ContentView: View {
             let html = renderMarkdown(markdown)
             htmlContent = wrapHTMLPage(body: html)
             baseURL = url.deletingLastPathComponent()
-            windowTitle = url.lastPathComponent
+            windowTitle = shortenedPath(url.path)
         } catch {
             htmlContent = wrapHTMLPage(body: "<p style='color:red'>Error reading file: \(error.localizedDescription)</p>")
             windowTitle = "Markviewz"
         }
 
-        // Sync dock tooltip with window title
+        // Dock tooltip shows just the filename
         DispatchQueue.main.async {
-            NSApp.windows.first?.miniwindowTitle = windowTitle
+            NSApp.windows.first?.miniwindowTitle = url.lastPathComponent
         }
     }
+}
+
+private func shortenedPath(_ path: String) -> String {
+    var display = path
+    let home = FileManager.default.homeDirectoryForCurrentUser.path
+    let homePrefix = home.hasSuffix("/") ? home : home + "/"
+    if display.hasPrefix(homePrefix) {
+        display = "~/" + display.dropFirst(homePrefix.count)
+    } else if display == home {
+        display = "~"
+    }
+
+    let maxLength = 60
+    guard display.count > maxLength else { return display }
+
+    // Keep first component and last two path components, join with ellipsis
+    let components = display.components(separatedBy: "/").filter { !$0.isEmpty }
+    guard components.count > 3 else { return display }
+
+    let prefix = components[0] == "~" ? "~" : "/" + components[0]
+    let suffix = components.suffix(2).joined(separator: "/")
+    return prefix + "/\u{2026}/" + suffix
 }
 
 private let welcomeHTML = """
