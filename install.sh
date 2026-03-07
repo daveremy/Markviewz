@@ -15,15 +15,27 @@ mkdir -p "$MACOS"
 cp .build/release/Markviewz "$MACOS/Markviewz"
 cp Info.plist "$CONTENTS/Info.plist"
 
-# Create CLI symlink — try /usr/local/bin, fall back to ~/bin
+# Create CLI wrapper script (uses `open -a` to reuse running instance)
 echo "Installing CLI tool..."
-if [ -w /usr/local/bin ] && ln -sf "$MACOS/Markviewz" /usr/local/bin/markviewz 2>/dev/null; then
+CLI_SCRIPT='#!/bin/bash
+if [ $# -eq 0 ]; then
+    open -a Markviewz
+else
+    open -a Markviewz "$@"
+fi'
+
+if [ -w /usr/local/bin ]; then
+    rm -f /usr/local/bin/markviewz
+    echo "$CLI_SCRIPT" > /usr/local/bin/markviewz
+    chmod +x /usr/local/bin/markviewz
     CLI_PATH="/usr/local/bin/markviewz"
 else
-    mkdir -p "$HOME/bin"
-    ln -sf "$MACOS/Markviewz" "$HOME/bin/markviewz"
-    CLI_PATH="$HOME/bin/markviewz"
-    echo "  (Add ~/bin to your PATH if not already there)"
+    mkdir -p "$HOME/.local/bin"
+    rm -f "$HOME/.local/bin/markviewz"
+    echo "$CLI_SCRIPT" > "$HOME/.local/bin/markviewz"
+    chmod +x "$HOME/.local/bin/markviewz"
+    CLI_PATH="$HOME/.local/bin/markviewz"
+    echo "  (Add ~/.local/bin to your PATH if not already there)"
 fi
 
 echo ""

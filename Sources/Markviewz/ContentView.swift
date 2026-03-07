@@ -5,11 +5,12 @@ struct ContentView: View {
     @EnvironmentObject var appDelegate: AppDelegate
 
     @State private var htmlContent: String = wrapHTMLPage(body: welcomeHTML)
+    @State private var baseURL: URL?
     @State private var showFileImporter = false
     @State private var windowTitle = "Markviewz"
 
     var body: some View {
-        MarkdownWebView(html: htmlContent)
+        MarkdownWebView(html: htmlContent, baseURL: baseURL)
             .frame(minWidth: 600, minHeight: 400)
             .onDrop(of: [.fileURL], isTargeted: nil) { providers in
                 guard let provider = providers.first else { return false }
@@ -61,10 +62,18 @@ struct ContentView: View {
             let markdown = try String(contentsOf: url, encoding: .utf8)
             let html = renderMarkdown(markdown)
             htmlContent = wrapHTMLPage(body: html)
+            baseURL = url.deletingLastPathComponent()
             windowTitle = url.lastPathComponent
+            // Update dock tooltip to show filename instead of "Markviewz"
+            DispatchQueue.main.async {
+                NSApp.windows.first?.miniwindowTitle = url.lastPathComponent
+            }
         } catch {
             htmlContent = wrapHTMLPage(body: "<p style='color:red'>Error reading file: \(error.localizedDescription)</p>")
             windowTitle = "Markviewz"
+            DispatchQueue.main.async {
+                NSApp.windows.first?.miniwindowTitle = "Markviewz"
+            }
         }
     }
 }

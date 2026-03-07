@@ -142,6 +142,29 @@ img {
 
 strong { font-weight: 600; }
 
+/* Collapsible frontmatter */
+details.frontmatter {
+    margin-bottom: 0;
+    font-size: 13px;
+    opacity: 0.6;
+}
+details.frontmatter summary {
+    cursor: pointer;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #656d76;
+    user-select: none;
+}
+details.frontmatter pre {
+    margin-top: 8px;
+    font-size: 12px;
+    padding: 12px;
+}
+details.frontmatter + hr {
+    margin-top: 12px;
+}
+
 /* Simple syntax highlighting */
 .keyword { color: #cf222e; }
 .string { color: #0a3069; }
