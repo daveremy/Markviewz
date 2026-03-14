@@ -105,12 +105,12 @@ git add package.json .claude-plugin/plugin.json .claude-plugin/marketplace.json 
 git commit -m "$NEW_VERSION"
 git tag "v$NEW_VERSION"
 
-echo "Publishing to npm..."
-npm publish --access public
-
-# 5. Push (only after successful publish)
+# 5. Push commit and tag first — postinstall clones by tag, so it must exist before npm publish
 echo "Pushing to GitHub..."
 git push origin main "v$NEW_VERSION"
+
+echo "Publishing to npm..."
+npm publish --access public
 
 # 6. Update aggregated marketplace
 MARKETPLACE_DIR="${CLAUDE_PLUGINS_DIR:-$HOME/code/claude-plugins}"

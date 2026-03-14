@@ -15,7 +15,7 @@
     "url": "https://github.com/daveremy/Markviewz"
   },
   "bin": {
-    "markviewz": "bin/postinstall.sh"
+    "markviewz": "bin/markviewz"
   },
   "files": [
     ".claude-plugin/",

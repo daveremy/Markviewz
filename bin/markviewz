@@ -1,0 +1,14 @@
+#!/bin/bash
+# CLI proxy — delegates to the native markviewz wrapper installed by postinstall.
+# This script is the npm bin entry so `npx -y markviewz` works.
+
+# Check common install locations
+for cmd in /usr/local/bin/markviewz "$HOME/.local/bin/markviewz"; do
+  if [[ -x "$cmd" ]]; then
+    exec "$cmd" "$@"
+  fi
+done
+
+echo "Markviewz is not installed. Run: npx -y markviewz" >&2
+echo "(The postinstall script should have built and installed it automatically.)" >&2
+exit 1
