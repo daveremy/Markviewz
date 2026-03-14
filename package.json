@@ -1,0 +1,29 @@
+{
+  "name": "markviewz",
+  "version": "1.0.0",
+  "description": "Native macOS markdown viewer — Claude Code plugin with /markviewz skill",
+  "license": "MIT",
+  "keywords": [
+    "markdown",
+    "viewer",
+    "macos",
+    "claude-code",
+    "plugin"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/daveremy/Markviewz"
+  },
+  "bin": {
+    "markviewz": "bin/markviewz"
+  },
+  "files": [
+    ".claude-plugin/",
+    "skills/",
+    "bin/"
+  ],
+  "scripts": {
+    "postinstall": "bash bin/postinstall.sh",
+    "release": "./scripts/release.sh"
+  }
+}

@@ -10,9 +10,20 @@ A native macOS markdown viewer app. SwiftUI + WKWebView. Read-only — no editin
 swift build              # debug
 swift build -c release   # release
 ./install.sh             # build, install .app to /Applications, install CLI wrapper
+npm pack --dry-run       # verify npm package contents
 ```
 
 No test suite yet. Manual testing: open a .md file, check rendering in light/dark mode.
+
+## Release
+
+```bash
+./scripts/release.sh patch   # 1.0.0 -> 1.0.1
+./scripts/release.sh minor   # 1.0.1 -> 1.1.0
+./scripts/release.sh major   # 1.1.0 -> 2.0.0
+```
+
+Bumps version in package.json, plugin.json, marketplace.json, install.sh, Info.plist, and CHANGELOG.md. Publishes to npm, pushes to GitHub, and updates the aggregated marketplace.
 
 ## Architecture
 
