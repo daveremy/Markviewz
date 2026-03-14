@@ -2,7 +2,7 @@
 
 ## [Unreleased]
 
-## [1.0.0] - 2026-03-14
+## [0.1.0] - 2026-03-14
 
 ### Added
 - Initial npm package release
@@ -16,5 +16,5 @@
 - Local image support (relative paths)
 - Single-instance reuse via `open -a`
 
-[Unreleased]: https://github.com/daveremy/Markviewz/compare/v1.0.0...HEAD
-[1.0.0]: https://github.com/daveremy/Markviewz/releases/tag/v1.0.0
+[Unreleased]: https://github.com/daveremy/Markviewz/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/daveremy/Markviewz/releases/tag/v0.1.0
