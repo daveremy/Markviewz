@@ -2,6 +2,11 @@
 # CLI proxy — delegates to the native markviewz wrapper installed by postinstall.
 # This script is the npm bin entry so `npx -y markviewz` works.
 
+if [[ "$(uname)" != "Darwin" ]]; then
+  echo "Markviewz is macOS-only and cannot run on this platform." >&2
+  exit 1
+fi
+
 # Check common install locations
 for cmd in /usr/local/bin/markviewz "$HOME/.local/bin/markviewz"; do
   if [[ -x "$cmd" ]]; then
@@ -9,6 +14,6 @@ for cmd in /usr/local/bin/markviewz "$HOME/.local/bin/markviewz"; do
   fi
 done
 
-echo "Markviewz is not installed. Run: npx -y markviewz" >&2
-echo "(The postinstall script should have built and installed it automatically.)" >&2
+echo "Markviewz is not installed. The postinstall script should have built it automatically." >&2
+echo "To install manually: git clone https://github.com/daveremy/Markviewz.git && cd Markviewz && ./install.sh" >&2
 exit 1
