@@ -6,13 +6,11 @@ set -euo pipefail
 #
 # Steps:
 #   1. Verify clean working tree on main
-#   2. Bump version (package.json, plugin.json, marketplace.json, install.sh, Info.plist, CHANGELOG.md)
+#   2. Bump version in all files
 #   3. Verify package contents
-#   4. Commit version bump
-#   5. Git tag
-#   6. Publish to npm
-#   7. Push to GitHub (only after successful publish)
-#   8. Update aggregated marketplace (daveremy/claude-plugins)
+#   4. Commit, tag, publish to npm
+#   5. Push to GitHub (only after successful publish)
+#   6. Update aggregated marketplace (daveremy/claude-plugins)
 
 BUMP="${1:-patch}"
 
@@ -39,73 +37,60 @@ npm version "$BUMP" --no-git-tag-version --no-commit-hooks > /dev/null
 NEW_VERSION=$(node -p "require('./package.json').version")
 echo "Version: $OLD_VERSION → $NEW_VERSION"
 
-# Sync plugin.json
-node -e "
-const fs = require('fs');
-const f = '.claude-plugin/plugin.json';
-const j = JSON.parse(fs.readFileSync(f, 'utf8'));
-j.version = '$NEW_VERSION';
-fs.writeFileSync(f, JSON.stringify(j, null, 2) + '\n');
-"
-
-# Sync marketplace.json
-node -e "
-const fs = require('fs');
-const f = '.claude-plugin/marketplace.json';
-const j = JSON.parse(fs.readFileSync(f, 'utf8'));
-j.plugins[0].version = '$NEW_VERSION';
-fs.writeFileSync(f, JSON.stringify(j, null, 2) + '\n');
-"
-
-# Sync install.sh VERSION
-node -e "
-const fs = require('fs');
-const f = 'install.sh';
-fs.writeFileSync(f, fs.readFileSync(f, 'utf8').replace(/^VERSION=\"[^\"]*\"/m, 'VERSION=\"$NEW_VERSION\"'));
-"
-
-# Sync Info.plist (both CFBundleVersion and CFBundleShortVersionString)
-node -e "
-const fs = require('fs');
-const f = 'Info.plist';
-let content = fs.readFileSync(f, 'utf8');
-// Replace the version string that follows CFBundleVersion
-content = content.replace(
-  /(<key>CFBundleVersion<\/key>\s*<string>)[^<]*(<\/string>)/,
-  '\$1$NEW_VERSION\$2'
-);
-// Replace the version string that follows CFBundleShortVersionString
-content = content.replace(
-  /(<key>CFBundleShortVersionString<\/key>\s*<string>)[^<]*(<\/string>)/,
-  '\$1$NEW_VERSION\$2'
-);
-fs.writeFileSync(f, content);
-"
-
-# Sync CHANGELOG.md — rename [Unreleased] to new version with date
+# Sync version across all files in a single node invocation
 TODAY=$(date +%Y-%m-%d)
-node -e "
+NEW_VERSION="$NEW_VERSION" OLD_VERSION="$OLD_VERSION" TODAY="$TODAY" node -e "
 const fs = require('fs');
-const f = 'CHANGELOG.md';
-let content = fs.readFileSync(f, 'utf8');
-content = content.replace(
+const v = process.env.NEW_VERSION;
+const oldV = process.env.OLD_VERSION;
+const today = process.env.TODAY;
+
+// plugin.json
+const pf = '.claude-plugin/plugin.json';
+const pj = JSON.parse(fs.readFileSync(pf, 'utf8'));
+pj.version = v;
+fs.writeFileSync(pf, JSON.stringify(pj, null, 2) + '\n');
+
+// marketplace.json
+const mf = '.claude-plugin/marketplace.json';
+const mj = JSON.parse(fs.readFileSync(mf, 'utf8'));
+mj.plugins[0].version = v;
+fs.writeFileSync(mf, JSON.stringify(mj, null, 2) + '\n');
+
+// install.sh VERSION
+const isf = 'install.sh';
+fs.writeFileSync(isf, fs.readFileSync(isf, 'utf8').replace(/^VERSION=\"[^\"]*\"/m, 'VERSION=\"' + v + '\"'));
+
+// Info.plist (CFBundleVersion and CFBundleShortVersionString)
+const ipf = 'Info.plist';
+let plist = fs.readFileSync(ipf, 'utf8');
+plist = plist.replace(
+  /(<key>CFBundleVersion<\/key>\s*<string>)[^<]*(<\/string>)/,
+  '\$1' + v + '\$2'
+);
+plist = plist.replace(
+  /(<key>CFBundleShortVersionString<\/key>\s*<string>)[^<]*(<\/string>)/,
+  '\$1' + v + '\$2'
+);
+fs.writeFileSync(ipf, plist);
+
+// CHANGELOG.md — add new version heading, update links
+const cf = 'CHANGELOG.md';
+let cl = fs.readFileSync(cf, 'utf8');
+cl = cl.replace(
   '## [Unreleased]',
-  '## [Unreleased]\n\n## [$NEW_VERSION] - $TODAY'
+  '## [Unreleased]\n\n## [' + v + '] - ' + today
 );
-// Update compare links
-content = content.replace(
-  /\[Unreleased\]: (.*\/)v[^.]*\.\.\./,
-  '[Unreleased]: \$1v$NEW_VERSION...'
+cl = cl.replace(
+  /(\[Unreleased\]: .*\/)v[^.]*\.\.\./,
+  '\$1v' + v + '...'
 );
-// Add new version link before the last version link
-const lastVersionLink = content.match(/\[[0-9]+\.[0-9]+\.[0-9]+\]: /);
-if (lastVersionLink) {
-  content = content.replace(
-    lastVersionLink[0],
-    '[$NEW_VERSION]: https://github.com/daveremy/Markviewz/compare/v$OLD_VERSION...v$NEW_VERSION\n' + lastVersionLink[0]
-  );
-}
-fs.writeFileSync(f, content);
+// Insert new version comparison link right after [Unreleased] link
+cl = cl.replace(
+  /(\[Unreleased\]:.*\n)/,
+  '\$1[' + v + ']: https://github.com/daveremy/Markviewz/compare/v' + oldV + '...v' + v + '\n'
+);
+fs.writeFileSync(cf, cl);
 "
 
 # 3. Verify package contents
@@ -114,24 +99,20 @@ echo "Package contents:"
 npm pack --dry-run 2>&1 | tail -10
 echo ""
 
-# 4. Commit
+# 4. Commit, tag, publish
 git add package.json .claude-plugin/plugin.json .claude-plugin/marketplace.json install.sh Info.plist CHANGELOG.md
 git commit -m "$NEW_VERSION"
-
-# 5. Tag
 git tag "v$NEW_VERSION"
 
-# 6. Publish (before push — if this fails, no tag/commit escapes to remote)
 echo "Publishing to npm..."
 npm publish --access public
 
-# 7. Push (only after successful publish)
+# 5. Push (only after successful publish)
 echo "Pushing to GitHub..."
-git push origin main
-git push origin "v$NEW_VERSION"
+git push origin main "v$NEW_VERSION"
 
-# 8. Update aggregated marketplace
-MARKETPLACE_DIR="$HOME/code/claude-plugins"
+# 6. Update aggregated marketplace
+MARKETPLACE_DIR="${CLAUDE_PLUGINS_DIR:-$HOME/code/claude-plugins}"
 MARKETPLACE_FILE="$MARKETPLACE_DIR/.claude-plugin/marketplace.json"
 PLUGIN_NAME="markviewz"
 
@@ -140,16 +121,18 @@ if [[ -d "$MARKETPLACE_DIR" ]]; then
   (
     cd "$MARKETPLACE_DIR"
     git pull --rebase origin main
-    node -e "
+    NEW_VERSION="$NEW_VERSION" PLUGIN_NAME="$PLUGIN_NAME" node -e "
 const fs = require('fs');
-const f = '$MARKETPLACE_FILE';
+const f = process.cwd() + '/.claude-plugin/marketplace.json';
+const v = process.env.NEW_VERSION;
+const name = process.env.PLUGIN_NAME;
 const m = JSON.parse(fs.readFileSync(f, 'utf8'));
-const plugin = m.plugins.find(p => p.name === '$PLUGIN_NAME');
+const plugin = m.plugins.find(p => p.name === name);
 if (plugin) {
-  plugin.version = '$NEW_VERSION';
+  plugin.version = v;
   fs.writeFileSync(f, JSON.stringify(m, null, 2) + '\n');
 } else {
-  console.error('Warning: $PLUGIN_NAME not found in marketplace.json');
+  console.error('Warning: ' + name + ' not found in marketplace.json');
   process.exit(1);
 }
 "

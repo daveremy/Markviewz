@@ -9,7 +9,12 @@ if [[ "$(uname)" != "Darwin" ]]; then
   exit 0
 fi
 
-# Requires Swift toolchain
+# Requires git and Swift toolchain
+if ! command -v git &>/dev/null; then
+  echo "Error: git is required to install Markviewz."
+  exit 1
+fi
+
 if ! command -v swift &>/dev/null; then
   echo "Error: Swift is required to build Markviewz."
   echo "Install Xcode from the App Store or the Swift toolchain from https://swift.org"
@@ -17,11 +22,11 @@ if ! command -v swift &>/dev/null; then
 fi
 
 REPO_URL="https://github.com/daveremy/Markviewz.git"
-BUILD_DIR="/tmp/Markviewz"
+BUILD_DIR=$(mktemp -d)
+trap 'rm -rf "$BUILD_DIR"' EXIT
 
 echo "Installing Markviewz..."
-rm -rf "$BUILD_DIR"
 git clone --depth 1 "$REPO_URL" "$BUILD_DIR"
 
 cd "$BUILD_DIR"
-exec ./install.sh
+./install.sh
