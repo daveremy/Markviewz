@@ -10,7 +10,7 @@ Run: `markviewz $ARGUMENTS`
 If the command fails because markviewz is not installed, tell the user to install it:
 
 ```bash
-rm -rf /tmp/Markviewz && git clone --depth 1 https://github.com/daveremy/Markviewz.git /tmp/Markviewz && cd /tmp/Markviewz && ./install.sh
+npx -y markviewz
 ```
 
 If no file was specified, ask the user which markdown file they want to view.

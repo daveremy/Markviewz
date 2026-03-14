@@ -34,6 +34,13 @@ That's it. No editing, no bloat, no Electron. Just a native Mac app that renders
 If you use [Claude Code](https://claude.com/claude-code), install Markviewz as a plugin to get the `/markviewz` skill:
 
 ```
+/plugin marketplace add daveremy/claude-plugins
+/plugin install markviewz@daveremy-plugins
+```
+
+Or install directly from this repo's marketplace:
+
+```
 /plugin marketplace add daveremy/Markviewz
 /plugin install markviewz@Markviewz
 ```
