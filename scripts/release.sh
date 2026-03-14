@@ -54,7 +54,8 @@ fs.writeFileSync(pf, JSON.stringify(pj, null, 2) + '\n');
 // marketplace.json
 const mf = '.claude-plugin/marketplace.json';
 const mj = JSON.parse(fs.readFileSync(mf, 'utf8'));
-mj.plugins[0].version = v;
+const mp = mj.plugins.find(p => p.name === 'markviewz');
+if (mp) mp.version = v;
 fs.writeFileSync(mf, JSON.stringify(mj, null, 2) + '\n');
 
 // install.sh VERSION
@@ -82,7 +83,7 @@ cl = cl.replace(
   '## [Unreleased]\n\n## [' + v + '] - ' + today
 );
 cl = cl.replace(
-  /(\[Unreleased\]: .*\/)v[^.]*\.\.\./,
+  /(\[Unreleased\]: .*\/)v[\d.]+\.\.\./,
   '\$1v' + v + '...'
 );
 // Insert new version comparison link right after [Unreleased] link

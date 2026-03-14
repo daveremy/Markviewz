@@ -25,8 +25,19 @@ REPO_URL="https://github.com/daveremy/Markviewz.git"
 BUILD_DIR=$(mktemp -d)
 trap 'rm -rf "$BUILD_DIR"' EXIT
 
-echo "Installing Markviewz..."
-git clone --depth 1 "$REPO_URL" "$BUILD_DIR"
+# Determine version tag from the npm package's package.json
+SCRIPT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+if [[ -f "$SCRIPT_DIR/package.json" ]] && command -v node &>/dev/null; then
+  PKG_VERSION=$(node -p "require('$SCRIPT_DIR/package.json').version" 2>/dev/null || true)
+fi
+TAG="${PKG_VERSION:+v$PKG_VERSION}"
+
+echo "Installing Markviewz${TAG:+ $TAG}..."
+if [[ -n "$TAG" ]]; then
+  git clone --depth 1 --branch "$TAG" "$REPO_URL" "$BUILD_DIR"
+else
+  git clone --depth 1 "$REPO_URL" "$BUILD_DIR"
+fi
 
 cd "$BUILD_DIR"
 ./install.sh
