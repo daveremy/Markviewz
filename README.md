@@ -34,6 +34,13 @@ That's it. No editing, no bloat, no Electron. Just a native Mac app that renders
 If you use [Claude Code](https://claude.com/claude-code), install Markviewz as a plugin to get the `/markviewz` skill:
 
 ```
+/plugin marketplace add daveremy/claude-plugins
+/plugin install markviewz@daveremy-plugins
+```
+
+Or install directly from this repo's marketplace:
+
+```
 /plugin marketplace add daveremy/Markviewz
 /plugin install markviewz@Markviewz
 ```
@@ -56,17 +63,23 @@ If you use [Codex CLI](https://github.com/openai/codex), ask Codex to install th
 install the markviewz skill from daveremy/Markviewz at path codex/markviewz
 ```
 
-### Manual Install
+### npm
 
 Requires macOS 14+ and Swift 5.9+.
+
+```bash
+npx -y markviewz
+```
+
+This clones the repo, builds a release binary, creates `Markviewz.app` in `/Applications`, and installs a `markviewz` CLI wrapper.
+
+### Manual Install
 
 ```bash
 git clone https://github.com/daveremy/Markviewz.git
 cd Markviewz
 ./install.sh
 ```
-
-This builds a release binary, creates `Markviewz.app` in `/Applications`, and installs a `markviewz` CLI wrapper.
 
 ## Usage
 
