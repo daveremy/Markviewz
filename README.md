@@ -63,17 +63,23 @@ If you use [Codex CLI](https://github.com/openai/codex), ask Codex to install th
 install the markviewz skill from daveremy/Markviewz at path codex/markviewz
 ```
 
-### Manual Install
+### npm
 
 Requires macOS 14+ and Swift 5.9+.
+
+```bash
+npx -y markviewz
+```
+
+This clones the repo, builds a release binary, creates `Markviewz.app` in `/Applications`, and installs a `markviewz` CLI wrapper.
+
+### Manual Install
 
 ```bash
 git clone https://github.com/daveremy/Markviewz.git
 cd Markviewz
 ./install.sh
 ```
-
-This builds a release binary, creates `Markviewz.app` in `/Applications`, and installs a `markviewz` CLI wrapper.
 
 ## Usage
 
