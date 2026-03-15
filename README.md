@@ -42,7 +42,7 @@ Or install directly from this repo's marketplace:
 
 ```
 /plugin marketplace add daveremy/Markviewz
-/plugin install markviewz@Markviewz
+/plugin install markviewz@markviewz
 ```
 
 Then ask Claude to "show me the README" or use `/markviewz README.md`. If the binary isn't installed yet, Claude will guide you through the install.
