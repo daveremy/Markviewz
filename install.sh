@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-VERSION="0.1.0"
+VERSION="0.1.1"
 
 echo "Building Markviewz..."
 swift build -c release 2>&1
