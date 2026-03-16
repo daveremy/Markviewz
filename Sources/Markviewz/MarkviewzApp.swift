@@ -22,7 +22,12 @@ struct MarkviewzApp: App {
     }
 
     private func printDocument() {
-        guard let webView = WebViewStore.shared.webView else { return }
+        guard let webView = WebViewStore.shared.webView,
+              let window = webView.window else { return }
+
+        webView.setValue(true, forKey: "drawsBackground")
+        webView.display()
+
         let printInfo = NSPrintInfo.shared.copy() as! NSPrintInfo
         printInfo.horizontalPagination = .fit
         printInfo.verticalPagination = .automatic
@@ -36,7 +41,9 @@ struct MarkviewzApp: App {
         let printOp = webView.printOperation(with: printInfo)
         printOp.showsPrintPanel = true
         printOp.showsProgressPanel = true
-        printOp.run()
+        printOp.runModal(for: window, delegate: nil, didRun: nil, contextInfo: nil)
+
+        webView.setValue(false, forKey: "drawsBackground")
     }
 }
 
