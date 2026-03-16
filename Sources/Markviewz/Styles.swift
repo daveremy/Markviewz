@@ -175,6 +175,43 @@ details.frontmatter + hr {
     .string { color: #a5d6ff; }
     .comment { color: #8b949e; }
 }
+
+@media print {
+    body {
+        color: #24292f !important;
+        background-color: #ffffff !important;
+        max-width: 100%;
+        padding: 0;
+        margin: 0;
+    }
+    a { color: #0969da !important; }
+    code {
+        background-color: rgba(175,184,193,0.2) !important;
+    }
+    pre {
+        background-color: #f6f8fa !important;
+        border-color: #d1d9e0 !important;
+    }
+    blockquote {
+        border-left-color: #d1d9e0 !important;
+        color: #59636e !important;
+    }
+    table th, table td {
+        border-color: #d1d9e0 !important;
+    }
+    table tr:nth-child(2n) {
+        background-color: #f6f8fa !important;
+    }
+    hr {
+        background-color: #d1d9e0 !important;
+    }
+    h1, h2 {
+        border-bottom-color: #d1d9e0 !important;
+    }
+    .keyword { color: #cf222e !important; }
+    .string { color: #0a3069 !important; }
+    .comment { color: #6e7781 !important; }
+}
 """
 
 func wrapHTMLPage(body: String) -> String {
