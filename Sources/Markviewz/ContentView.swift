@@ -1,16 +1,30 @@
 import SwiftUI
 import UniformTypeIdentifiers
 
+/// Immutable snapshot of what's currently rendered. A single state field
+/// holding the document avoids multiple SwiftUI rebuilds when opening a
+/// new file (previously each of html / baseURL / windowTitle was its
+/// own @State, causing the WebView to reload 2–3 times per open).
+struct MarkdownDocument {
+    let html: String
+    let baseURL: URL?
+    let title: String
+
+    static let welcome = MarkdownDocument(
+        html: wrapHTMLPage(body: welcomeHTML),
+        baseURL: nil,
+        title: "Markviewz"
+    )
+}
+
 struct ContentView: View {
     @EnvironmentObject var appDelegate: AppDelegate
 
-    @State private var htmlContent: String = wrapHTMLPage(body: welcomeHTML)
-    @State private var baseURL: URL?
+    @State private var document: MarkdownDocument = .welcome
     @State private var showFileImporter = false
-    @State private var windowTitle = "Markviewz"
 
     var body: some View {
-        MarkdownWebView(html: htmlContent, baseURL: baseURL)
+        MarkdownWebView(html: document.html, baseURL: document.baseURL)
             .frame(minWidth: 600, minHeight: 400)
             .onDrop(of: [.fileURL], isTargeted: nil) { providers in
                 guard let provider = providers.first else { return false }
@@ -44,12 +58,12 @@ struct ContentView: View {
                     .keyboardShortcut("o", modifiers: .command)
                 }
             }
-            .navigationTitle(windowTitle)
-            .onReceive(appDelegate.$fileToOpen) { url in
-                if let url = url {
-                    openFile(url)
-                    appDelegate.fileToOpen = nil
-                }
+            .navigationTitle(document.title)
+            .onReceive(appDelegate.$fileToOpen.compactMap { $0 }) { url in
+                openFile(url)
+                // Reset AFTER consuming. compactMap above filters the nil
+                // we set here, so onReceive doesn't fire again.
+                appDelegate.fileToOpen = nil
             }
     }
 
@@ -59,16 +73,26 @@ struct ContentView: View {
             if accessing { url.stopAccessingSecurityScopedResource() }
         }
 
+        let newDocument: MarkdownDocument
         do {
             let markdown = try String(contentsOf: url, encoding: .utf8)
             let html = renderMarkdown(markdown)
-            htmlContent = wrapHTMLPage(body: html)
-            baseURL = url.deletingLastPathComponent()
-            windowTitle = shortenedPath(url.path)
+            newDocument = MarkdownDocument(
+                html: wrapHTMLPage(body: html),
+                baseURL: url.deletingLastPathComponent(),
+                title: shortenedPath(url.path)
+            )
         } catch {
-            htmlContent = wrapHTMLPage(body: "<p style='color:red'>Error reading file: \(error.localizedDescription)</p>")
-            windowTitle = "Markviewz"
+            newDocument = MarkdownDocument(
+                html: wrapHTMLPage(body: "<p style='color:red'>Error reading file: \(error.localizedDescription)</p>"),
+                baseURL: nil,
+                title: "Markviewz"
+            )
         }
+
+        // Single atomic state write — SwiftUI rebuilds the view once,
+        // MarkdownWebView.updateNSView loads the content once.
+        document = newDocument
 
         // Dock tooltip shows just the filename
         DispatchQueue.main.async {
