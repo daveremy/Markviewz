@@ -6,7 +6,10 @@ struct MarkviewzApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
 
     var body: some Scene {
-        WindowGroup {
+        // Single-window viewer. `Window` (not `WindowGroup`) ensures one
+        // window is reused across file-open events instead of spawning
+        // a new window per invocation of `markviewz <file>`.
+        Window("Markviewz", id: "main") {
             ContentView()
                 .environmentObject(appDelegate)
         }
