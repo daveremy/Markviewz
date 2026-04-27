@@ -39,9 +39,11 @@ final class FileWatcher: ObservableObject {
         fileDescriptor = -1
     }
 
-    private func startWatching() {
+    /// Open the file and attach a dispatch source. Returns true on success.
+    @discardableResult
+    private func startWatching() -> Bool {
         let fd = open(url.path, O_EVTONLY)
-        guard fd >= 0 else { return }
+        guard fd >= 0 else { return false }
         fileDescriptor = fd
 
         let src = DispatchSource.makeFileSystemObjectSource(
@@ -64,6 +66,7 @@ final class FileWatcher: ObservableObject {
         src.setCancelHandler { close(fd) }
         self.source = src
         src.resume()
+        return true
     }
 
     /// Re-establish the watch after an atomic save (delete + rename).
@@ -80,37 +83,14 @@ final class FileWatcher: ObservableObject {
         DispatchQueue.main.asyncAfter(deadline: .now() + delay) { [weak self] in
             guard let self = self else { return }
 
-            let fd = open(self.url.path, O_EVTONLY)
-            if fd < 0 {
-                if attempt < maxAttempts - 1 {
-                    self.restartWatching(attempt: attempt + 1)
-                }
-                // After all retries, stop watching. Content stays as-is.
-                return
-            }
-
-            self.fileDescriptor = fd
-            let src = DispatchSource.makeFileSystemObjectSource(
-                fileDescriptor: fd,
-                eventMask: [.write, .delete, .rename, .revoke],
-                queue: .main
-            )
-            src.setEventHandler { [weak self] in
-                guard let self = self else { return }
-                let flags = src.data
-                if flags.contains(.delete) || flags.contains(.rename) || flags.contains(.revoke) {
-                    self.restartWatching()
-                    return
-                }
+            if self.startWatching() {
+                // Signal change AFTER successfully re-establishing the watch,
+                // so the view reloads the new file content.
                 self.changeCount += 1
+            } else if attempt < maxAttempts - 1 {
+                self.restartWatching(attempt: attempt + 1)
             }
-            src.setCancelHandler { close(fd) }
-            self.source = src
-            src.resume()
-
-            // Signal change AFTER successfully re-establishing the watch,
-            // so the view reloads the new file content.
-            self.changeCount += 1
+            // After all retries, stop watching. Content stays as-is.
         }
     }
 }
