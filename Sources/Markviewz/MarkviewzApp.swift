@@ -120,9 +120,14 @@ class AppDelegate: NSObject, NSApplicationDelegate, ObservableObject {
     fileprivate func openFile(_ url: URL) {
         let canonical = canonicalize(url)
 
-        // Already open — bring forward.
+        // Already open — bring forward and reload content.
         if let existing = windowsByURL[canonical] {
             existing.makeKeyAndOrderFront(nil)
+            NotificationCenter.default.post(
+                name: .markviewzReloadFile,
+                object: nil,
+                userInfo: ["url": canonical]
+            )
             return
         }
 
